@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tally App</title>
+<style>
+  :root {
+    --font-large: 24pt;
+    --font-normal: 12pt;
+    --font-smallest: 10pt;
+    --btn-large-padding: 0.6em 1.2em;
+    --btn-medium-padding: 0.4em 0.8em;
+    --btn-small-padding: 0.3em 0.6em;
+    --gap: 1em;
+    --border-color: #666;
+    --bg-light: #fafafa;
+    --bg-dark: #eee;
+    --text-color: #222;
+    --danger-color: #b33;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    font-size: var(--font-normal);
+    margin: 1em 2em;
+    color: var(--text-color);
+    background: var(--bg-light);
+  }
+
+  h1 {
+    font-size: var(--font-large);
+    margin-bottom: 0.5em;
+  }
+
+  label {
+    font-size: var(--font-normal);
+    display: inline-block;
+    width: 3.5em;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  input[type="text"] {
+    font-size: var(--font-normal);
+    padding: 0.3em 0.5em;
+    width: 20em;
+    vertical-align: middle;
+  }
+
+  /* Button classes */
+  button.large {
+    font-size: var(--font-large);
+    padding: var(--btn-large-padding);
+    cursor: pointer;
+    margin-left: 0.5em;
+  }
+
+  button.medium {
+    font-size: calc(var(--font-normal) * 0.85);
+    padding: var(--btn-medium-padding);
+    cursor: pointer;
+    margin-right: 0.5em;
+  }
+
+  button.small {
+    font-size: var(--font-smallest);
+    padding: var(--btn-small-padding);
+    cursor: pointer;
+    margin-top: 0.5em;
+    color: var(--danger-color);
+  }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  /* Table styling */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--gap);
+    font-size: var(--font-normal);
+    background: white;
+  }
+
+  thead tr {
+    background: var(--bg-dark);
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 0.3em 0.6em;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  th {
+    user-select: none;
+  }
+
+  /* Controls container */
+  #list-controls {
+    margin-top: 0.8em;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+
+  /* Metatable dropdown styling */
+  #metatable-container {
+    margin-top: 2em;
+    border: 1px solid var(--border-color);
+    padding: 0.8em;
+    font-size: var(--font-smallest);
+    background: var(--bg-dark);
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  #metatable-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.4em;
+  }
+
+  #metatable-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+
+  #metatable-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-smallest);
+  }
+
+  #metatable-table th, #metatable-table td {
+    border: 1px solid var(--border-color);
+    padding: 0.2em 0.4em;
+  }
+
+  #metatable-table th {
+    background: var(--bg-light);
+  }
+
+  #metatable-table input[type="text"] {
+    width: 100%;
+    font-size: var(--font-smallest);
+    border: none;
+    background: transparent;
+    padding: 0 0.1em;
+  }
+
+  #metatable-table input[type="text"]:disabled {
+    background: transparent;
+    color: var(--text-color);
+    cursor: default;
+  }
+
+  #metatable-clear-btn {
+    color: var(--danger-color);
+  }
+
+  /* Layout adjustments */
+  #input-row {
+    margin-bottom: var(--gap);
+  }
+
+  #input-row label {
+    vertical-align: middle;
+  }
+
+  /* Checkbox right aligned */
+  #edit-toggle-container {
+    margin-left: auto;
+    font-size: var(--font-smallest);
+  }
+
+</style>
+</head>
+<body>
+
+<h1>Tally</h1>
+
+<div id="input-row">
+  <label for="upc-input">UPC:</label>
+  <input type="text" id="upc-input" autocomplete="off" />
+  <button id="submit-btn" class="large">Submit</button>
+</div>
+
+<div id="list-controls">
+  <button id="copy-btn" class="medium" disabled>Copy</button>
+  <button id="save-btn" class="medium" disabled>Save</button>
+  <button id="clear-list-btn" class="small" disabled>Clear</button>
+</div>
+
+<table id="tally-table" aria-label="Tally List">
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Description</th>
+      <th>UPC</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Dynamic rows inserted here -->
+  </tbody>
+</table>
+
+<!-- Metatable dropdown -->
+<div id="metatable-container" aria-label="Metatable Editor">
+  <div id="metatable-header">
+    <div id="metatable-controls">
+      <button id="metatable-export" class="medium">Export</button>
+      <button id="metatable-import" class="medium">Import</button>
+      <button id="metatable-clear-btn" class="small">Clear</button>
+    </div>
+    <div id="edit-toggle-container">
+      <label>
+        <input type="checkbox" id="edit-toggle" />
+        Edit
+      </label>
+    </div>
+  </div>
+  <table id="metatable-table" aria-label="Metatable">
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Description</th>
+        <th>UPC</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Dynamic metatable rows inserted here -->
+    </tbody>
+  </table>
+</div>
+
+<input type="file" id="file-import" accept="application/json" style="display:none" />
+
+<script>
+  (() => {
+    const upcInput = document.getElementById('upc-input');
+    const submitBtn = document.getElementById('submit-btn');
+    const tallyTableBody = document.querySelector('#tally-table tbody');
+    const copyBtn = document.getElementById('copy-btn');
+    const saveBtn = document.getElementById('save-btn');
+    const clearListBtn = document.getElementById('clear-list-btn');
+
+    const metatableContainer = document.getElementById('metatable-container');
+    const metatableTableBody = document.querySelector('#metatable-table tbody');
+    const metatableExportBtn = document.getElementById('metatable-export');
+    const metatableImportBtn = document.getElementById('metatable-import');
+    const metatableClearBtn = document.getElementById('metatable-clear-btn');
+    const editToggle = document.getElementById('edit-toggle');
+    const fileImportInput = document.getElementById('file-import');
+
+    // Data stores
+    // metatable structure: { UPCstring: {code: string, description: string, upc: string} }
+    let metatable = {};
+    // tally structure: { UPCstring: count }
+    let tally = {};
+
+    // Helpers
+    function saveMetatableToStorage() {
+      localStorage.setItem('tallyAppMetatable', JSON.stringify(metatable));
+    }
+
+    function loadMetatableFromStorage() {
+      try {
+        const data = localStorage.getItem('tallyAppMetatable');
+        if (data) {
+          metatable = JSON.parse(data);
+        } else {
+          metatable = {};
+        }
+      } catch {
+        metatable = {};
+      }
+    }
+
+    function updateMetatableTable() {
+      metatableTableBody.innerHTML = '';
+      const keys = Object.keys(metatable).sort();
+      for (const upc of keys) {
+        const entry = metatable[upc];
+        const tr = document.createElement('tr');
+
+        // Code cell
+        const codeTd = document.createElement('td');
+        const codeInput = document.createElement('input');
+        codeInput.type = 'text';
+        codeInput.value = entry.code;
+        codeInput.disabled = !editToggle.checked;
+        codeInput.addEventListener('input', () => {
+          metatable[upc].code = codeInput.value.trim();
+          saveMetatableToStorage();
+          updateTallyTable(); // reflect changes
+        });
+        codeTd.appendChild(codeInput);
+        tr.appendChild(codeTd);
+
+        // Description cell
+        const descTd = document.createElement('td');
+        const descInput = document.createElement('input');
+        descInput.type = 'text';
+        descInput.value = entry.description;
+        descInput.disabled = !editToggle.checked;
+        descInput.addEventListener('input', () => {
+          metatable[upc].description = descInput.value.trim();
+          saveMetatableToStorage();
+          updateTallyTable();
+        });
+        descTd.appendChild(descInput);
+        tr.appendChild(descTd);
+
+        // UPC cell
+        const upcTd = document.createElement('td');
+        const upcInput = document.createElement('input');
+        upcInput.type = 'text';
+        upcInput.value = entry.upc;
+        upcInput.disabled = !editToggle.checked;
+        upcInput.addEventListener('input', () => {
+          const oldUpc = upc;
+          const newUpc = upcInput.value.trim();
+          if (newUpc && newUpc !== oldUpc) {
+            // Change key in metatable object
+            metatable[newUpc] = metatable[oldUpc];
+            metatable[newUpc].upc = newUpc;
+            delete metatable[oldUpc];
+            saveMetatableToStorage();
+            updateMetatableTable();
+            updateTallyTable();
+          } else if (newUpc === '') {
+            // Ignore blank UPC in metatable
+            upcInput.value = oldUpc;
+          }
+        });
+        upcTd.appendChild(upcInput);
+        tr.appendChild(upcTd);
+
+        metatableTableBody.appendChild(tr);
+      }
+    }
+
+    function updateTallyTable() {
+      tallyTableBody.innerHTML = '';
+      const entries = Object.entries(tally).filter(([, count]) => count > 0);
+      entries.sort(([aUpc], [bUpc]) => aUpc.localeCompare(bUpc));
+
+      for (const [upc, count] of entries) {
+        const tr = document.createElement('tr');
+
+        // Code from metatable or blank
+        const codeTd = document.createElement('td');
+        codeTd.textContent = metatable[upc]?.code || '';
+        tr.appendChild(codeTd);
+
+        // Description from metatable or blank
+        const descTd = document.createElement('td');
+        descTd.textContent = metatable[upc]?.description || '';
+        tr.appendChild(descTd);
+
+        // UPC itself
+        const upcTd = document.createElement('td');
+        upcTd.textContent = upc;
+        tr.appendChild(upcTd);
+
+        // Count
+        const countTd = document.createElement('td');
+        countTd.textContent = count;
+        tr.appendChild(countTd);
+
+        tallyTableBody.appendChild(tr);
+      }
+
+      const hasEntries = entries.length > 0;
+      copyBtn.disabled = !hasEntries;
+      saveBtn.disabled = !hasEntries;
+      clearListBtn.disabled = !hasEntries;
+    }
+
+    // Add an entry to the tally
+    function addEntry(upc) {
+      if (!upc) return;
+      tally[upc] = (tally[upc] || 0) + 1;
+
+      // If the UPC is not in metatable, add empty record
+      if (!metatable[upc]) {
+        metatable[upc] = { code: '', description: '', upc };
+        saveMetatableToStorage();
+        updateMetatableTable();
+      }
+
+      updateTallyTable();
+    }
+
+    // Clear tally list with confirmation
+    function clearTally() {
+      if (!confirm('Clear all tally entries? This cannot be undone.')) return;
+      tally = {};
+      updateTallyTable();
+    }
+
+    // Copy list to clipboard
+    async function copyTally() {
+      const lines = [];
+      for (const [upc, count] of Object.entries(tally)) {
+        if (count < 1) continue;
+        const code = metatable[upc]?.code || '';
+        const desc = metatable[upc]?.description || '';
+        lines.push(`${code} | ${desc} | ${upc} | ${count}`);
+      }
+      const text = lines.join('\n');
+      try {
+        await navigator.clipboard.writeText(text);
+        alert('Tally copied to clipboard.');
+      } catch {
+        alert('Failed to copy to clipboard.');
+      }
+    }
+
+    // Save tally to file
+    function saveTally() {
+      const lines = [];
+      for (const [upc, count] of Object.entries(tally)) {
+        if (count < 1) continue;
+        const code = metatable[upc]?.code || '';
+        const desc = metatable[upc]?.description || '';
+        lines.push(`${code} | ${desc} | ${upc} | ${count}`);
+      }
+      const text = lines.join('\n');
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'tally.txt';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // Export metatable as JSON file
+    function exportMetatable() {
+      const json = JSON.stringify(metatable, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'metatable.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // Import metatable from JSON file
+    function importMetatable(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (typeof data !== 'object' || data === null) throw new Error();
+          // Validate entries somewhat
+          for (const key in data) {
+            if (!data[key].code || !data[key].description || !data[key].upc) {
+              throw new Error();
+            }
+          }
+          metatable = data;
+          saveMetatableToStorage();
+          updateMetatableTable();
+          updateTallyTable();
+          alert('Metatable imported successfully.');
+        } catch {
+          alert('Invalid metatable JSON file.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // Clear metatable with confirmation
+    function clearMetatable() {
+      if (!confirm('Clear the entire metatable? This cannot be undone.')) return;
+      metatable = {};
+      saveMetatableToStorage();
+      updateMetatableTable();
+      updateTallyTable();
+    }
+
+    // Event handlers
+    submitBtn.addEventListener('click', () => {
+      const val = upcInput.value.trim();
+      if (val) {
+        addEntry(val);
+        upcInput.value = '';
+        upcInput.focus();
+      }
+    });
+
+    upcInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitBtn.click();
+      }
+    });
+
+    copyBtn.addEventListener('click', copyTally);
+    saveBtn.addEventListener('click', saveTally);
+    clearListBtn.addEventListener('click', clearTally);
+
+    metatableExportBtn.addEventListener('click', exportMetatable);
+    metatableImportBtn.addEventListener('click', () => fileImportInput.click());
+    fileImportInput.addEventListener('change', () => {
+      if (fileImportInput.files.length > 0) {
+        importMetatable(fileImportInput.files[0]);
+        fileImportInput.value = '';
+      }
+    });
+
+    metatableClearBtn.addEventListener('click', clearMetatable);
+
+    editToggle.addEventListener('change', () => {
+      updateMetatableTable();
+      if (!editToggle.checked) {
+        // Editing stopped, sync tally table descriptions
+        updateTallyTable();
+      }
+    });
+
+    // Initialization
+    loadMetatableFromStorage();
+    updateMetatableTable();
+    updateTallyTable();
+  })();
+</script>
+
+</body>
+</html>
