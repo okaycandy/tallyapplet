@@ -406,24 +406,89 @@
     }
 
     function copyTallyToClipboard() {
-      const lines = Object.entries(tally).map(([upc, count]) => {
+      const rows = Object.entries(tally).map(([upc, count]) => {
         const meta = metatable[upc] || { code: "", description: "" };
-        return `${meta.code} | ${meta.description} | ${upc} | ${count}`;
+        return {
+          code: meta.code,
+          description: meta.description,
+          upc,
+          count: String(count)
+        };
       });
-      navigator.clipboard.writeText(lines.join("\n"));
+
+      // Determine max widths
+      const colWidths = {
+        code: Math.max(...rows.map(r => r.code.length), 4),
+        description: Math.max(...rows.map(r => r.description.length), 11),
+        upc: Math.max(...rows.map(r => r.upc.length), 3),
+        count: Math.max(...rows.map(r => r.count.length), 5)
+      };
+
+      // Helper function for padding
+      const pad = (str, width) => str.padEnd(width, ' ');
+
+      // Compose lines with padding
+      const lines = rows.map(r =>
+        `${pad(r.code, colWidths.code)} | ` +
+        `${pad(r.description, colWidths.description)} | ` +
+        `${pad(r.upc, colWidths.upc)} | ` +
+        `${pad(r.count, colWidths.count)}`
+      );
+
+      const header =
+        `${pad("Code", colWidths.code)} | ` +
+        `${pad("Description", colWidths.description)} | ` +
+        `${pad("UPC", colWidths.upc)} | ` +
+        `${pad("Count", colWidths.count)}`;
+
+      lines.unshift(header);
+
+      navigator.clipboard.writeText(lines.join('\n'));
     }
 
+
     function saveTallyToFile() {
-      const lines = Object.entries(tally).map(([upc, count]) => {
+      const rows = Object.entries(tally).map(([upc, count]) => {
         const meta = metatable[upc] || { code: "", description: "" };
-        return `${meta.code} | ${meta.description} | ${upc} | ${count}`;
+        return {
+          code: meta.code,
+          description: meta.description,
+          upc,
+          count: String(count)
+        };
       });
+
+      const colWidths = {
+        code: Math.max(...rows.map(r => r.code.length), 4),
+        description: Math.max(...rows.map(r => r.description.length), 11),
+        upc: Math.max(...rows.map(r => r.upc.length), 3),
+        count: Math.max(...rows.map(r => r.count.length), 5)
+      };
+
+      const pad = (str, width) => str.padEnd(width, ' ');
+
+      const lines = rows.map(r =>
+        `${pad(r.code, colWidths.code)} | ` +
+        `${pad(r.description, colWidths.description)} | ` +
+        `${pad(r.upc, colWidths.upc)} | ` +
+        `${pad(r.count, colWidths.count)}`
+      );
+
+      const header =
+        `${pad("Code", colWidths.code)} | ` +
+        `${pad("Description", colWidths.description)} | ` +
+        `${pad("UPC", colWidths.upc)} | ` +
+        `${pad("Count", colWidths.count)}`;
+
+      lines.unshift(header);
+
       const blob = new Blob([lines.join("\n")], { type: "text/plain" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
       link.download = "tally.txt";
       link.click();
     }
+
 
     function clearTally() {
       if (confirm("Are you sure you want to clear the list?")) {
@@ -493,15 +558,15 @@
   return icon;
   }
 
-  function showCopyTooltip(target) {
-    let tooltip = document.createElement('span');
+  function showCopyTooltip(icon) {
+    const tooltip = document.createElement('span');
     tooltip.className = 'copy-tooltip';
     tooltip.textContent = 'Copied';
     document.body.appendChild(tooltip);
 
-    const rect = target.getBoundingClientRect();
-    tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
-    tooltip.style.top = `${rect.top + window.scrollY - 28}px`; // above the cell
+    const rect = icon.getBoundingClientRect();
+    tooltip.style.left = `${rect.right + window.scrollX - 4}px`;
+    tooltip.style.top = `${rect.top + window.scrollY - 8}px`;
 
     tooltip.style.opacity = '1';
 
@@ -510,6 +575,7 @@
       setTimeout(() => tooltip.remove(), 400);
     }, 1000);
   }
+
 
   function addCopyIconsToTallyTable() {
     const rows = tallyTableBody.querySelectorAll('tr');
@@ -527,7 +593,7 @@
               .join('')
               .trim();
             navigator.clipboard.writeText(textToCopy);
-            showCopyTooltip(cell);
+            showCopyTooltip(icon);
           });
         }
       });
