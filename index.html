@@ -1,288 +1,351 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tally App</title>
-  <style>
-    :root {
-      --font-large: 12pt;
-      --font-normal: 10pt;
-      --font-smallest: 8pt;
-      --btn-large-padding: 0.5em 1em;
-      --btn-medium-padding: 0.4em 0.8em;
-      --btn-small-padding: 0.3em 0.6em;
-      --gap: 1em;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tally App</title>
 
-      --border-color: #555;
-      --bg-light: #222;
-      --bg-dark: #111;
-      --text-color: #ddd;
-      --text-muted: #aaa;
-      --danger-color: #e55353;
-      --row-alt-bg: #2a2a2a;
-    }
+    <style>
+      /* === Root Variables for Colors, Fonts, and Spacing === */
+      :root {
+        /* Font Sizes */
+        --font-large: 12pt;      /* Formerly "normal" text */
+        --font-medium: 11pt;     /* Adjusted for button scaling */
+        --font-small: 10pt;
+        --font-smallest: 8pt;
 
-    body {
-      font-family: Arial, sans-serif;
-      font-size: var(--font-normal);
-      margin: 1em 2em;
-      color: var(--text-color);
-      background: var(--bg-light);
-    }
+        /* Button Padding */
+        --btn-large-padding: 0.4em 0.8em;  /* Formerly "medium" */
+        --btn-medium-padding: 0.3em 0.6em; /* Formerly "small" */
+        --btn-small-padding: 0.25em 0.5em;
 
-    h1 {
-      font-size: var(--font-large);
-      margin-bottom: 0.5em;
-      color: var(--text-color);
-    }
+        /* Spacing */
+        --gap: 1em;
 
-    label {
-      font-size: var(--font-normal);
-      display: inline-block;
-      width: 3.5em;
-      text-align: left;
-      vertical-align: middle;
-      color: var(--text-color);
-    }
+        /* Colors */
+        --color-border: #555;
+        --color-bg-light: #222;
+        --color-bg-dark: #111;
+        --color-text: #ddd;
+        --color-text-muted: #aaa;
+        --color-danger: #e55353;
+        --color-row-alt-bg: #2a2a2a;
+        --color-btn-bg-large: #444;
+        --color-btn-bg-medium: #555;
+        --color-btn-bg-small: #55000022;
+        --color-btn-border-small: #aa4444;
+        --color-tooltip-bg: #444;
+        --color-tooltip-text: #eee;
+      }
 
-    input[type="text"] {
-      font-size: var(--font-normal);
-      padding: 0.3em 0.5em;
-      width: 20em;
-      vertical-align: middle;
-      background: #333;
-      border: 1px solid var(--border-color);
-      color: var(--text-color);
-    }
+      /* === Global Styles === */
+      body {
+        font-family: Arial, sans-serif;
+        font-size: var(--font-large);
+        margin: 1em 2em;
+        background-color: var(--color-bg-light);
+        color: var(--color-text);
+      }
 
-    input[type="text"]:disabled {
-      background: #222;
-      color: var(--text-muted);
-    }
+      h1 {
+        font-size: var(--font-large);
+        margin-bottom: 0.5em;
+        font-weight: normal;
+        color: var(--color-text);
+      }
 
-    button.large {
-      font-size: var(--font-large);
-      padding: var(--btn-large-padding);
-      cursor: pointer;
-      margin-left: 0.5em;
-      background-color: #444;
-      color: var(--text-color);
-      border: 1px solid var(--border-color);
-    }
+      label {
+        display: inline-block;
+        width: 3.5em;
+        text-align: left;
+        vertical-align: middle;
+        font-size: var(--font-large);
+        color: var(--color-text);
+      }
 
-    button.medium {
-      font-size: var(--font-normal);
-      padding: var(--btn-medium-padding);
-      cursor: pointer;
-      margin-right: 0.5em;
-      background-color: #555;
-      color: var(--text-color);
-      border: 1px solid var(--border-color);
-    }
+      input[type="text"] {
+        font-size: var(--font-large);
+        padding: 0.3em 0.5em;
+        width: 20em;
+        vertical-align: middle;
+        background-color: #333;
+        border: 1px solid var(--color-border);
+        color: var(--color-text);
+        box-sizing: border-box;
+      }
 
-    button.small {
-      font-size: var(--font-smallest);
-      padding: var(--btn-small-padding);
-      cursor: pointer;
-      margin-top: 0.5em;
-      color: var(--danger-color);
-      background-color: #55000022;
-      border: 1px solid #aa4444;
-    }
+      input[type="text"]:disabled {
+        background-color: #222;
+        color: var(--color-text-muted);
+        cursor: default;
+      }
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: default;
-      background-color: #333;
-      color: var(--text-muted);
-      border-color: #444;
-    }
+      /* === Buttons === */
+      button.large {
+        font-size: var(--font-large);
+        padding: var(--btn-large-padding);
+        margin-left: 0.5em;
+        cursor: pointer;
+        background-color: var(--color-btn-bg-large);
+        color: var(--color-text);
+        border: 1px solid var(--color-border);
+        user-select: none;
+      }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: var(--gap);
-      font-size: var(--font-normal);
-      background: #111;
-      color: var(--text-color);
-      border: 1px solid var(--border-color);
-    }
+      button.medium {
+        font-size: var(--font-medium);
+        padding: var(--btn-medium-padding);
+        margin-right: 0.5em;
+        cursor: pointer;
+        background-color: var(--color-btn-bg-medium);
+        color: var(--color-text);
+        border: 1px solid var(--color-border);
+        user-select: none;
+      }
 
-    thead tr {
-      background: #222;
-    }
+      button.small {
+        font-size: var(--font-smallest);
+        padding: var(--btn-small-padding);
+        margin-top: 0.5em;
+        cursor: pointer;
+        color: var(--color-danger);
+        background-color: var(--color-btn-bg-small);
+        border: 1px solid var(--color-btn-border-small);
+        user-select: none;
+      }
 
-    th, td {
-      border: 1px solid var(--border-color);
-      padding: 0.3em 0.6em;
-      text-align: left;
-    }
+      button:disabled {
+        opacity: 0.5;
+        cursor: default;
+        background-color: #333;
+        color: var(--color-text-muted);
+        border-color: #444;
+      }
 
-    tbody tr:nth-child(even) {
-      background-color: var(--row-alt-bg);
-    }
+      /* === Tables === */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: var(--gap);
+        font-size: var(--font-large);
+        background-color: var(--color-bg-dark);
+        color: var(--color-text);
+        border: 1px solid var(--color-border);
+      }
 
-    #list-controls {
-      margin-top: 0.8em;
-      display: flex;
-      align-items: center;
-      gap: 0.5em;
-    }
+      thead tr {
+        background-color: #222;
+      }
 
-    #metatable-container {
-      margin-top: 1em;
-      border: 1px solid var(--border-color);
-      padding: 0.8em;
-      font-size: var(--font-smallest);
-      background: #222;
-      max-width: 100%;
-      overflow-x: auto;
-      color: var(--text-color);
-    }
+      th, td {
+        border: 1px solid var(--color-border);
+        padding: 0.3em 0.6em;
+        text-align: left;
+        vertical-align: middle;
+      }
 
-    #metatable-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.4em;
-    }
+      tbody tr:nth-child(even) {
+        background-color: var(--color-row-alt-bg);
+      }
 
-    #metatable-controls {
-      display: flex;
-      align-items: center;
-      gap: 0.5em;
-    }
+      /* === List Controls Container === */
+      #list-controls {
+        margin-top: 0.8em;
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+      }
 
-    #metatable-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: var(--font-smallest);
-      color: var(--text-color);
-    }
+      /* === Metadata Table Container === */
+      #metatable-container {
+        margin-top: 1em;
+        border: 1px solid var(--color-border);
+        padding: 0.8em;
+        font-size: var(--font-smallest);
+        background-color: var(--color-bg-light);
+        max-width: 100%;
+        overflow-x: auto;
+        color: var(--color-text);
+      }
 
-    #metatable-table th, #metatable-table td {
-      border: 1px solid var(--border-color);
-      padding: 0.2em 0.4em;
-    }
+      /* Metadata Table Header */
+      #metatable-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.4em;
+      }
 
-    #metatable-table input[type="text"] {
-      width: 100%;
-      font-size: var(--font-smallest);
-      border: none;
-      background: transparent;
-      padding: 0 0.1em;
-      color: var(--text-color);
-    }
+      #metatable-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+      }
 
-    #metatable-table input[type="text"]:disabled {
-      background: transparent;
-      color: var(--text-muted);
-      cursor: default;
-    }
+      /* Metadata Table */
+      #metatable-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: var(--font-smallest);
+        color: var(--color-text);
+      }
 
-    #input-row {
-      margin-bottom: var(--gap);
-    }
+      #metatable-table th, #metatable-table td {
+        border: 1px solid var(--color-border);
+        padding: 0.2em 0.4em;
+        vertical-align: middle;
+      }
 
-    #edit-toggle-container {
-      margin-left: auto;
-      font-size: var(--font-smallest);
-    }
-    /* Container for cell content and copy icon */
-    td {
-      position: relative;
-      cursor: default;
-    }
+      #metatable-table input[type="text"] {
+        width: 100%;
+        font-size: var(--font-smallest);
+        border: none;
+        background: transparent;
+        padding: 0 0.1em;
+        color: var(--color-text);
+        box-sizing: border-box;
+      }
 
-    td .copy-icon {
-      position: absolute;
-      top: 50%;
-      right: 0.4em;
-      transform: translateY(-50%);
-      font-size: 0.9em;
-      opacity: 0;
-      cursor: pointer;
-      user-select: none;
-      transition: opacity 0.3s ease;
-      pointer-events: auto;
-      color: var(--text-muted, #aaa);
-      z-index: 10;
-    }
+      #metatable-table input[type="text"]:disabled {
+        background: transparent;
+        color: var(--color-text-muted);
+        cursor: default;
+      }
 
-    td:hover .copy-icon {
-      opacity: 1;
-    }
+      /* Input Row Spacing */
+      #input-row {
+        margin-bottom: var(--gap);
+      }
 
-    .copy-tooltip {
-      position: absolute;
-      background: #444;
-      color: #eee;
-      font-size: 0.75em;
-      padding: 0.2em 0.5em;
-      border-radius: 3px;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      white-space: nowrap;
-      z-index: 20;
-      user-select: none;
-    }
-  </style>
-</head>
-<body>
+      /* Edit Toggle Container Alignment */
+      #edit-toggle-container {
+        margin-left: auto;
+        font-size: var(--font-smallest);
+      }
 
-  <h1>Tally</h1>
+      /* === Copy Icon Styling inside table cells === */
+      td {
+        position: relative;
+        cursor: default;
+      }
 
-  <div id="input-row">
-    <label for="upc-input">UPC:</label>
-    <input type="text" id="upc-input" autocomplete="off" />
-    <button id="submit-btn" class="large">Submit</button>
-  </div>
+      td .copy-icon {
+        position: absolute;
+        top: 50%;
+        right: 0.4em;
+        transform: translateY(-50%);
+        font-size: 0.9em;
+        opacity: 0;
+        cursor: pointer;
+        user-select: none;
+        transition: opacity 0.3s ease;
+        pointer-events: auto;
+        color: var(--color-text-muted);
+        z-index: 10;
+      }
 
-  <div id="list-controls">
-    <button id="copy-btn" class="medium" disabled>Copy</button>
-    <button id="save-btn" class="medium" disabled>Save</button>
-    <button id="clear-list-btn" class="small" disabled>Clear</button>
-  </div>
+      td:hover .copy-icon {
+        opacity: 1;
+      }
 
-  <table id="tally-table">
-    <thead>
-      <tr><th>Code</th><th>Description</th><th>UPC</th><th>Count</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+      /* Tooltip for copy confirmation */
+      .copy-tooltip {
+        position: absolute;
+        background: var(--color-tooltip-bg);
+        color: var(--color-tooltip-text);
+        font-size: 0.75em;
+        padding: 0.2em 0.5em;
+        border-radius: 3px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        white-space: nowrap;
+        z-index: 20;
+        user-select: none;
+      }
+    </style>
+  </head>
 
-  <button id="metatable-toggle-btn" class="small">+</button>
-  <div id="metatable-wrapper" style="display: none;">
-    <div id="metatable-container">
-      <div id="metatable-header">
-        <div id="metatable-controls">
-          <button id="metatable-export" class="medium">Export</button>
-          <button id="metatable-import" class="medium">Import</button>
-          <button id="metatable-clear-btn" class="small" disabled>Clear</button>
-        </div>
-        <div id="edit-toggle-container">
-          <label><input type="checkbox" id="edit-toggle" /> Edit</label>
-        </div>
-      </div>
-      <table id="metatable-table">
-        <thead><tr><th>Code</th><th>Description</th><th>UPC</th></tr></thead>
-        <tbody></tbody>
-      </table>
+  <body>
+    <h1>Tally</h1>
+
+    <!-- UPC Input and Submit -->
+    <div id="input-row">
+      <label for="upc-input">UPC:</label>
+      <input type="text" id="upc-input" autocomplete="off" />
+      <button id="submit-btn" class="large">Submit</button>
     </div>
-  </div>
+
+    <!-- List Control Buttons -->
+    <div id="list-controls">
+      <button id="copy-btn" class="medium" disabled>Copy</button>
+      <button id="save-btn" class="medium" disabled>Save</button>
+      <button id="clear-list-btn" class="small" disabled>Clear</button>
+    </div>
+
+    <!-- Tally List Table -->
+    <table id="tally-table" aria-label="Tally List">
+      <thead>
+        <tr><th>Code</th><th>Description</th><th>UPC</th><th>Count</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <!-- Metatable Toggle -->
+    <button id="metatable-toggle-btn" class="small" aria-expanded="false" aria-controls="metatable-wrapper">+</button>
+    <span style="font-weight: 300;">Reference Table</span>
+
+    <!-- Metatable Section -->
+    <div id="metatable-wrapper" style="display: none;">
+      <div id="metatable-container" role="region" aria-label="Reference Table">
+        <div id="metatable-header">
+          <div id="metatable-controls">
+            <button id="metatable-export" class="medium">Export</button>
+            <button id="metatable-import" class="medium">Import</button>
+            <button id="metatable-clear-btn" class="small" disabled>Clear</button>
+          </div>
+          <div id="edit-toggle-container">
+            <label><input type="checkbox" id="edit-toggle" /> Edit</label>
+          </div>
+        </div>
+
+        <!-- Scraper Toggle -->
+        <div style="margin: 1em 0; font-size: var(--font-large); color: var(--color-text);">
+          <button id="scraper-toggle-btn" class="small" aria-expanded="false" aria-controls="scraper-wrapper">+</button>
+          <span style="font-weight: 300;">Scraper</span>
+
+          <div id="scraper-wrapper" style="display: none; margin-top: 0.5em;">
+            <div style="display: flex; gap: 0.5em;">
+              <input id="scraper-input" type="text" placeholder="Paste string to scrape" class="input-text" style="flex: 1;" />
+              <input id="scraper-upc-input" type="text" placeholder="Optional UPC" class="input-text" style="width: 120px;" />
+            </div>
+            <button id="scraper-button" class="medium" style="margin-top: 0.5em;">Scrape</button>
+          </div>
+        </div>
+
+        <!-- Metatable Editable Table -->
+        <table id="metatable-table" aria-label="Metadata Reference Table">
+          <thead>
+            <tr><th>Code</th><th>Description</th><th>UPC</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
 
   <input type="file" id="file-import" accept="application/json" style="display:none" />
 
+
   <script>
-    // JavaScript code for Tally App
+  (() => {
+    // Elements
     const upcInput = document.getElementById("upc-input");
     const submitBtn = document.getElementById("submit-btn");
     const tallyTableBody = document.querySelector("#tally-table tbody");
     const copyBtn = document.getElementById("copy-btn");
     const saveBtn = document.getElementById("save-btn");
     const clearListBtn = document.getElementById("clear-list-btn");
+
     const metatableToggleBtn = document.getElementById("metatable-toggle-btn");
     const metatableWrapper = document.getElementById("metatable-wrapper");
     const metatableExport = document.getElementById("metatable-export");
@@ -292,15 +355,27 @@
     const metatableTableBody = document.querySelector("#metatable-table tbody");
     const fileImport = document.getElementById("file-import");
 
-    let tally = {};
-    let metatable = {};
+    const scraperToggleBtn = document.getElementById("scraper-toggle-btn");
+    const scraperWrapper = document.getElementById("scraper-wrapper");
+    const scraperInput = document.getElementById("scraper-input");
+    const scraperUpcInput = document.getElementById("scraper-upc-input");
+    const scraperButton = document.getElementById("scraper-button");
 
-    // Storage keys
+    // Data
+    let tally = {};
+    window.metatable = {};
+
+    // Constants
     const METATABLE_KEY = "tally_metatable";
+
+    // ----------------------------
+    // Tally Table Management
+    // ----------------------------
 
     function updateTallyTable() {
       tallyTableBody.innerHTML = "";
       const hasRows = Object.keys(tally).length > 0;
+
       copyBtn.disabled = !hasRows;
       saveBtn.disabled = !hasRows;
       clearListBtn.disabled = !hasRows;
@@ -311,16 +386,23 @@
         row.innerHTML = `<td>${meta.code}</td><td>${meta.description}</td><td>${upc}</td><td>${count}</td>`;
         tallyTableBody.appendChild(row);
       }
+      addCopyIconsToTallyTable();
     }
+
+    // ----------------------------
+    // Metatable Management
+    // ----------------------------
 
     function updateMetatableTable() {
       metatableTableBody.innerHTML = "";
       for (const [upc, entry] of Object.entries(metatable)) {
+        const disabledAttr = editToggle.checked ? "" : "disabled";
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td><input type="text" value="${entry.code}" data-upc="${upc}" data-field="code" ${editToggle.checked ? "" : "disabled"}></td>
-          <td><input type="text" value="${entry.description}" data-upc="${upc}" data-field="description" ${editToggle.checked ? "" : "disabled"}></td>
-          <td><input type="text" value="${upc}" disabled></td>`;
+          <td><input type="text" value="${entry.code}" data-upc="${upc}" data-field="code" ${disabledAttr}></td>
+          <td><input type="text" value="${entry.description}" data-upc="${upc}" data-field="description" ${disabledAttr}></td>
+          <td><input type="text" value="${upc}" data-upc="${upc}" data-field="upc" ${disabledAttr}></td>
+        `;
         metatableTableBody.appendChild(row);
       }
     }
@@ -338,6 +420,10 @@
       }
     }
 
+    // ----------------------------
+    // Tally Input Handling
+    // ----------------------------
+
     function handleInputSubmit() {
       const upc = upcInput.value.trim();
       if (!upc) return;
@@ -353,6 +439,10 @@
       upcInput.value = "";
       updateTallyTable();
     }
+
+    // ----------------------------
+    // Export / Import
+    // ----------------------------
 
     function exportMetatable() {
       const blob = new Blob([JSON.stringify(metatable, null, 2)], { type: "application/json" });
@@ -405,7 +495,11 @@
       reader.readAsText(file);
     }
 
-    function copyTallyToClipboard() {
+    // ----------------------------
+    // Copy and Save Tally List
+    // ----------------------------
+
+    function getPaddedTallyLines() {
       const rows = Object.entries(tally).map(([upc, count]) => {
         const meta = metatable[upc] || { code: "", description: "" };
         return {
@@ -416,7 +510,6 @@
         };
       });
 
-      // Determine max widths
       const colWidths = {
         code: Math.max(...rows.map(r => r.code.length), 4),
         description: Math.max(...rows.map(r => r.description.length), 11),
@@ -424,10 +517,8 @@
         count: Math.max(...rows.map(r => r.count.length), 5)
       };
 
-      // Helper function for padding
       const pad = (str, width) => str.padEnd(width, ' ');
 
-      // Compose lines with padding
       const lines = rows.map(r =>
         `${pad(r.code, colWidths.code)} | ` +
         `${pad(r.description, colWidths.description)} | ` +
@@ -442,46 +533,16 @@
         `${pad("Count", colWidths.count)}`;
 
       lines.unshift(header);
+      return lines;
+    }
 
+    function copyTallyToClipboard() {
+      const lines = getPaddedTallyLines();
       navigator.clipboard.writeText(lines.join('\n'));
     }
 
-
     function saveTallyToFile() {
-      const rows = Object.entries(tally).map(([upc, count]) => {
-        const meta = metatable[upc] || { code: "", description: "" };
-        return {
-          code: meta.code,
-          description: meta.description,
-          upc,
-          count: String(count)
-        };
-      });
-
-      const colWidths = {
-        code: Math.max(...rows.map(r => r.code.length), 4),
-        description: Math.max(...rows.map(r => r.description.length), 11),
-        upc: Math.max(...rows.map(r => r.upc.length), 3),
-        count: Math.max(...rows.map(r => r.count.length), 5)
-      };
-
-      const pad = (str, width) => str.padEnd(width, ' ');
-
-      const lines = rows.map(r =>
-        `${pad(r.code, colWidths.code)} | ` +
-        `${pad(r.description, colWidths.description)} | ` +
-        `${pad(r.upc, colWidths.upc)} | ` +
-        `${pad(r.count, colWidths.count)}`
-      );
-
-      const header =
-        `${pad("Code", colWidths.code)} | ` +
-        `${pad("Description", colWidths.description)} | ` +
-        `${pad("UPC", colWidths.upc)} | ` +
-        `${pad("Count", colWidths.count)}`;
-
-      lines.unshift(header);
-
+      const lines = getPaddedTallyLines();
       const blob = new Blob([lines.join("\n")], { type: "text/plain" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
@@ -489,6 +550,9 @@
       link.click();
     }
 
+    // ----------------------------
+    // Clearing Data
+    // ----------------------------
 
     function clearTally() {
       if (confirm("Are you sure you want to clear the list?")) {
@@ -506,37 +570,72 @@
       }
     }
 
-    // Event bindings
-    submitBtn.onclick = handleInputSubmit;
-    upcInput.addEventListener("keypress", e => {
-      if (e.key === "Enter") handleInputSubmit();
-    });
-
-    copyBtn.onclick = copyTallyToClipboard;
-    saveBtn.onclick = saveTallyToFile;
-    clearListBtn.onclick = clearTally;
-
-    metatableExport.onclick = exportMetatable;
-    metatableImport.onclick = () => fileImport.click();
-    fileImport.onchange = () => importMetatable(fileImport.files[0]);
-
-    metatableClearBtn.onclick = clearMetatable;
-
-    editToggle.addEventListener("change", () => {
-      updateMetatableTable();
-      metatableClearBtn.disabled = !editToggle.checked;
-    });
+    // ----------------------------
+    // Editable Metatable Inputs
+    // ----------------------------
 
     metatableTableBody.addEventListener("input", e => {
       const target = e.target;
       const upc = target.dataset.upc;
       const field = target.dataset.field;
-      if (metatable[upc]) {
-        metatable[upc][field] = target.value;
+      const newValue = target.value.trim();
+
+      if (!metatable[upc]) return;
+
+      if (field !== "upc") {
+        metatable[upc][field] = newValue;
         saveMetatableToStorage();
         updateTallyTable();
       }
     });
+
+    metatableTableBody.addEventListener("blur", e => {
+      const target = e.target;
+      if (target.dataset.field !== "upc") return;
+
+      const oldUpc = target.dataset.upc;
+      const newUpc = target.value.trim();
+
+      if (!metatable[oldUpc]) return;
+      if (oldUpc === newUpc) return;
+
+      if (newUpc === "") {
+        alert("UPC cannot be empty.");
+        target.value = oldUpc;
+        return;
+      }
+      if (metatable[newUpc]) {
+        alert("This UPC already exists.");
+        target.value = oldUpc;
+        return;
+      }
+
+      // Rename the key safely
+      metatable[newUpc] = {
+        code: metatable[oldUpc].code,
+        description: metatable[oldUpc].description,
+        upc: newUpc
+      };
+      delete metatable[oldUpc];
+
+      saveMetatableToStorage();
+      updateMetatableTable();
+      updateTallyTable();
+    }, true);
+
+    // ----------------------------
+    // Edit Toggle Handler
+    // ----------------------------
+
+    editToggle.addEventListener("change", () => {
+      updateMetatableTable();
+      updateTallyTable();
+      metatableClearBtn.disabled = !editToggle.checked;
+    });
+
+    // ----------------------------
+    // Metatable Toggle Visibility
+    // ----------------------------
 
     metatableToggleBtn.addEventListener("click", () => {
       const isHidden = metatableWrapper.style.display === "none";
@@ -544,69 +643,162 @@
       metatableToggleBtn.textContent = isHidden ? "−" : "+";
     });
 
-    // Initialize
-    loadMetatableFromStorage();
-    updateMetatableTable();
-    updateTallyTable();
-    metatableClearBtn.disabled = true;
+    // ----------------------------
+    // Copy Icons for Tally Table Cells
+    // ----------------------------
 
     function createCopyIcon() {
-  const icon = document.createElement('span');
-  icon.textContent = '📋';
-  icon.className = 'copy-icon';
-  icon.title = 'Copy cell text';
-  return icon;
-  }
+      const icon = document.createElement('span');
+      icon.textContent = '📋';
+      icon.className = 'copy-icon';
+      icon.title = 'Copy cell text';
+      return icon;
+    }
 
-  function showCopyTooltip(icon) {
-    const tooltip = document.createElement('span');
-    tooltip.className = 'copy-tooltip';
-    tooltip.textContent = 'Copied';
-    document.body.appendChild(tooltip);
+    function showCopyTooltip(icon) {
+      const tooltip = document.createElement('span');
+      tooltip.className = 'copy-tooltip';
+      tooltip.textContent = 'Copied';
+      document.body.appendChild(tooltip);
 
-    const rect = icon.getBoundingClientRect();
-    tooltip.style.left = `${rect.right + window.scrollX - 4}px`;
-    tooltip.style.top = `${rect.top + window.scrollY - 8}px`;
+      const rect = icon.getBoundingClientRect();
+      tooltip.style.left = `${rect.right + window.scrollX - 4}px`;
+      tooltip.style.top = `${rect.top + window.scrollY - 8}px`;
 
-    tooltip.style.opacity = '1';
+      tooltip.style.opacity = '1';
 
-    setTimeout(() => {
-      tooltip.style.opacity = '0';
-      setTimeout(() => tooltip.remove(), 400);
-    }, 1000);
-  }
+      setTimeout(() => {
+        tooltip.style.opacity = '0';
+        setTimeout(() => tooltip.remove(), 400);
+      }, 1000);
+    }
 
-
-  function addCopyIconsToTallyTable() {
-    const rows = tallyTableBody.querySelectorAll('tr');
-    rows.forEach(row => {
-      [...row.cells].forEach(cell => {
-        // Avoid duplicate icons if updated multiple times
-        if (!cell.querySelector('.copy-icon')) {
-          const icon = createCopyIcon();
-          cell.appendChild(icon);
-          icon.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const textToCopy = Array.from(cell.childNodes)
-              .filter(node => node.nodeType === Node.TEXT_NODE)
-              .map(node => node.textContent)
-              .join('')
-              .trim();
-            navigator.clipboard.writeText(textToCopy);
-            showCopyTooltip(icon);
-          });
-        }
+    function addCopyIconsToTallyTable() {
+      const rows = tallyTableBody.querySelectorAll('tr');
+      rows.forEach(row => {
+        [...row.cells].forEach(cell => {
+          if (!cell.querySelector('.copy-icon')) {
+            const icon = createCopyIcon();
+            cell.appendChild(icon);
+            icon.addEventListener('click', e => {
+              e.stopPropagation();
+              const textToCopy = Array.from(cell.childNodes)
+                .filter(node => node.nodeType === Node.TEXT_NODE)
+                .map(node => node.textContent)
+                .join('')
+                .trim();
+              navigator.clipboard.writeText(textToCopy);
+              showCopyTooltip(icon);
+            });
+          }
+        });
       });
-    });
-  }
+    }
 
-  // After updating the tally table rows, also add copy icons:
-  const originalUpdateTallyTable = updateTallyTable;
-  updateTallyTable = function() {
-    originalUpdateTallyTable();
-    addCopyIconsToTallyTable();
-  };
+    // ----------------------------
+    // Scraper functionality
+    // ----------------------------
+
+    scraperToggleBtn.addEventListener("click", () => {
+      const isHidden = scraperWrapper.style.display === "none";
+      scraperWrapper.style.display = isHidden ? "block" : "none";
+      scraperToggleBtn.textContent = isHidden ? "−" : "+";
+      scraperToggleBtn.setAttribute("aria-expanded", isHidden ? "true" : "false");
+    });
+
+    scraperButton.addEventListener("click", () => {
+      const raw = scraperInput.value.trim();
+      if (!raw) {
+        alert('Input is empty.');
+        return;
+      }
+
+      const regex = /\bNUMERO\b\s*:?\s*(\d{7})\s*\bDESCRIPTION\b\s*:?\s*(.+)$/i;
+      const match = raw.match(regex);
+
+      if (!match) {
+        alert('Input does not match expected format.');
+        return;
+      }
+
+      const code = match[1];
+      const description = match[2].trim();
+      const upcOverride = scraperUpcInput.value.trim();
+
+      if (!window.metatable) {
+        alert('Metatable object not found.');
+        return;
+      }
+
+      if (upcOverride) {
+        window.metatable[upcOverride] = {
+          code,
+          description,
+          upc: upcOverride
+        };
+      } else {
+        // Find existing by code
+        const existingKey = Object.keys(window.metatable).find(key => window.metatable[key].code === code);
+        if (existingKey) {
+          window.metatable[existingKey].description = description;
+        } else {
+          window.metatable[code] = {
+            code,
+            description,
+            upc: code
+          };
+        }
+      }
+
+      saveMetatableToStorage();
+      updateMetatableTable();
+      updateTallyTable();
+
+      alert(`Added/updated metadata entry for code: ${code}`);
+
+      scraperInput.value = '';
+      scraperUpcInput.value = '';
+      scraperInput.focus();
+    });
+
+    // ----------------------------
+    // Initialization
+    // ----------------------------
+
+    function initialize() {
+      loadMetatableFromStorage();
+      updateMetatableTable();
+      updateTallyTable();
+      metatableClearBtn.disabled = true;
+    }
+
+    // Event Listeners for main inputs
+    submitBtn.addEventListener("click", handleInputSubmit);
+    upcInput.addEventListener("keypress", e => {
+      if (e.key === "Enter") handleInputSubmit();
+    });
+
+    copyBtn.addEventListener("click", copyTallyToClipboard);
+    saveBtn.addEventListener("click", saveTallyToFile);
+    clearListBtn.addEventListener("click", clearTally);
+
+    metatableExport.addEventListener("click", exportMetatable);
+    metatableImport.addEventListener("click", () => fileImport.click());
+    fileImport.addEventListener("change", () => importMetatable(fileImport.files[0]));
+
+    metatableClearBtn.addEventListener("click", clearMetatable);
+
+    editToggle.addEventListener("change", () => {
+      updateMetatableTable();
+      updateTallyTable();
+      metatableClearBtn.disabled = !editToggle.checked;
+    });
+
+    initialize();
+  })();
   </script>
+
+
 
 </body>
 </html>
