@@ -700,66 +700,122 @@
     // ----------------------------
 
     scraperToggleBtn.addEventListener("click", () => {
-      const isHidden = scraperWrapper.style.display === "none";
-      scraperWrapper.style.display = isHidden ? "block" : "none";
-      scraperToggleBtn.textContent = isHidden ? "−" : "+";
-      scraperToggleBtn.setAttribute("aria-expanded", isHidden ? "true" : "false");
+        const isHidden = scraperWrapper.style.display === "none";
+        scraperWrapper.style.display = isHidden ? "block" : "none";
+        scraperToggleBtn.textContent = isHidden ? "−" : "+";
+        scraperToggleBtn.setAttribute("aria-expanded", isHidden ? "true" : "false");
     });
 
     scraperButton.addEventListener("click", () => {
-      const raw = scraperInput.value.trim();
-      if (!raw) {
-        alert('Input is empty.');
-        return;
-      }
+    const raw = scraperInput.value.trim();
+    if (!raw) {
+      alert('Input is empty.');
+      return;
+    }
 
-      const regex = /\bNUMERO\b\s*:?\s*(\d{7})\s*\bDESCRIPTION\b\s*:?\s*(.+)$/i;
-      const match = raw.match(regex);
+    const regex = /\bNUMERO\b\s*:?\s*(\d{7})\s*\bDESCRIPTION\b\s*:?\s*(.+?)(?:\s*\bSTATUT\b\s*:.*)?$/i;
+    const match = raw.match(regex);
 
-      if (!match) {
-        alert('Input does not match expected format.');
-        return;
-      }
+    if (!match) {
+      alert('Input does not match expected format.');
+      return;
+    }
 
-      const code = match[1];
-      const description = match[2].trim();
-      const upcOverride = scraperUpcInput.value.trim();
+    const code = match[1];
+    const description = match[2].trim();
+    const upcOverride = scraperUpcInput.value.trim();
 
-      if (!window.metatable) {
-        alert('Metatable object not found.');
-        return;
-      }
+    if (!window.metatable) {
+      alert('Metatable object not found.');
+      return;
+    }
 
-      if (upcOverride) {
-        window.metatable[upcOverride] = {
-          code,
-          description,
-          upc: upcOverride
-        };
-      } else {
-        // Find existing by code
-        const existingKey = Object.keys(window.metatable).find(key => window.metatable[key].code === code);
-        if (existingKey) {
-          window.metatable[existingKey].description = description;
+    // Find entries by code and UPC
+    const entryByCodeKey = Object.keys(window.metatable).find(key => window.metatable[key].code === code);
+    const entryByCode = entryByCodeKey ? window.metatable[entryByCodeKey] : null;
+
+    const entryByUpcKey = Object.keys(window.metatable).find(key => key === upcOverride);
+    const entryByUpc = upcOverride && entryByUpcKey ? window.metatable[entryByUpcKey] : null;
+
+    if (!upcOverride) {
+      // 1. No UPC provided
+      if (entryByCode) {
+        // If existing entry has UPC, do not modify
+        if (entryByCode.upc) {
+          // Do nothing, no notification
         } else {
-          window.metatable[code] = {
-            code,
-            description,
-            upc: code
-          };
+          // Update description silently
+          entryByCode.description = description;
         }
+      } else {
+        // Add new entry with placeholder UPC silently
+        window.metatable[code] = { code, description, upc: "" };
       }
+    } else {
+      // 2. UPC provided
 
-      saveMetatableToStorage();
-      updateMetatableTable();
-      updateTallyTable();
+      if (entryByCode) {
+        // Code found, check UPC mismatch
+        if (entryByCode.upc !== upcOverride) {
+          // UPC mismatch prompt
+          const overwrite = confirm(
+            `UPC mismatch for code ${code}.\n` +
+            `Existing UPC: ${entryByCode.upc || "(blank)"}\n` +
+            `Provided UPC: ${upcOverride}\n\n` +
+            `Overwrite existing UPC with provided UPC?`
+          );
+          if (overwrite) {
+            // Rename key from old UPC to new UPC
+            if (entryByCode.upc && window.metatable[entryByCode.upc]) {
+              delete window.metatable[entryByCode.upc];
+            } else if (window.metatable[entryByCodeKey]) {
+              delete window.metatable[entryByCodeKey];
+            }
+            window.metatable[upcOverride] = { code, description, upc: upcOverride };
+            alert(`Overwrote UPC for code ${code} with ${upcOverride}.`);
+          } else {
+            // Keep old UPC, update description if changed
+            if (entryByCode.description !== description) {
+              entryByCode.description = description;
+            }
+            alert(`Kept existing UPC for code ${code}. Description updated if changed.`);
+          }
+        } else {
+          // UPC matches, check description
+          if (entryByCode.description !== description) {
+            entryByCode.description = description;
+            alert(`Updated description for code ${code}.`);
+          } else {
+            alert(`Entry already exists with same code, description, and UPC. No changes made.`);
+          }
+        }
+      } else if (entryByUpc) {
+        // 5. UPC matches but code doesn't
+        if (entryByUpc.code !== code) {
+          alert(`UPC collision detected:\nProvided code: ${code}\nExisting code for UPC: ${entryByUpc.code}`);
+        } else if (entryByUpc.description !== description) {
+          // 3. Code and UPC match but description differs
+          entryByUpc.description = description;
+          alert(`Updated description for UPC ${upcOverride}.`);
+        } else {
+          // 4. All match
+          alert(`Entry already exists with same code, description, and UPC. No changes made.`);
+        }
+      } else {
+        // New entry with UPC
+        window.metatable[upcOverride] = { code, description, upc: upcOverride };
+        alert(`Added new entry for UPC ${upcOverride} and code ${code}.`);
+      }
+    }
 
-      alert(`Added/updated metadata entry for code: ${code}`);
+    saveMetatableToStorage();
+    updateMetatableTable();
+    updateTallyTable();
 
-      scraperInput.value = '';
-      scraperUpcInput.value = '';
-      scraperInput.focus();
-    });
+    scraperInput.value = '';
+    scraperUpcInput.value = '';
+    scraperInput.focus();
+  });
 
     // ----------------------------
     // Initialization
